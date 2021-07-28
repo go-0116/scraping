@@ -19,7 +19,7 @@ url = 'https://www.ubereats.com/jp/feed?mod=deliveryDetails&pl=JTdCJTIyYWRkcmVzc
 
 URL = []
 
-for location in location_list[range(10)]:
+for location in location_list[range(5)]:
     browser.get(url)
     change_element = browser.find_element_by_xpath('//*[@id="wrapper"]/div[4]/div/div/div[2]/div[3]/div/div[2]/div[1]/div[2]/a')
     change_element.click() #配送先クリック
@@ -31,5 +31,5 @@ for location in location_list[range(10)]:
     sleep(1)
     URL.append(browser.current_url)
 
-
-print(URL)
+df['urls'] = URL
+print(df)
