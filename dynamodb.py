@@ -4,38 +4,57 @@ import boto3
 dynamodb = boto3.resource("dynamodb", region_name='ap-northeast-1')
 list(dynamodb.tables.all())
 
-table = dynamodb.Table('scraping')
-#table = dynamodb.create_table(
-'''
-TableName = 'scraping',
+#table = dynamodb.Table('Daily_Scraping')
+table = dynamodb.create_table(
+TableName = 'Daily_scraping',
     KeySchema = [
         {
-            'AttributeName' : 'location',
+            'AttributeName' : 'ID',
             'KeyType' : 'HASH'
         },
         {
-            'AttributeName' : 'url',
+            'AttributeName' : 'location',
             'KeyType' : 'RANGE'
         }
     ],
     AttributeDefinitions =[
         {
+            'AttributeName' : 'id',
+            'AttributeType' : 'S'
+        },
+        {
             'AttributeName' : 'location',
+            'AttributeType' : 'S'
+        },
+        {
+            'AttributeName' : 'cateory',
             'AttributeType' : 'S'
         },
         {
             'AttributeName' : 'url',
             'AttributeType' : 'S'
-        }
+        },
+        {
+            'AttributeName' : 'rank',
+            'AttributeType' : 'S'
+        },
+        {
+            'AttributeName' : 'date',
+            'AttributeType' : 'S'
+        },
+        {
+            'AttributeName' : 'restaurant_name',
+            'AttributeType' : 'S'
+        },
     ],
     ProvisionedThroughput={
         'ReadCapacityUnits':1,
         'WriteCapacityUnits':1
     }
 )
+
+
 '''
-
-
 from logging import exception
 from selenium import webdriver
 from selenium.webdriver import Chrome
@@ -77,7 +96,7 @@ for Location in location_list:
             'url':browser.current_url
         }
     )
-
+'''
 
 
 
