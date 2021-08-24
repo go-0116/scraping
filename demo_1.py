@@ -9,6 +9,7 @@ st.title('Uber検索順位チェッカー')
 st.subheader('・全てのデータを見る')
 
 df = pd.read_csv('base.csv', encoding="shift_jis")
+
 prefectures = df['prefecture']
 prefecture_list = list(set(prefectures))
 
@@ -19,14 +20,14 @@ flag = df['prefecture'].isin([selected_prefecture])
 df_prefecture = df[flag]
 cities = df_prefecture['city']
 city_list = list(set(cities))
-city_list.append('-')
+city_list.insert(0,'-')
 selected_city = st.sidebar.selectbox('市区', city_list)
 #市で絞り込み
 flag2 = df_prefecture['city'].isin([selected_city])
 df_city = df_prefecture[flag2]
 towns = df_city['town']
 town_list = list(set(towns))
-town_list.append('-')
+town_list.insert(0,'-')
 selected_town = st.sidebar.selectbox('町村', town_list)
 #町で絞り込み
 flag3 = df_city['town'].isin([selected_town])
@@ -56,18 +57,32 @@ df_category = df_date[flag5]
 
 #アウトプット用df作成
 ranks = df_category['rank']
-rank_list = list(ranks)
-
 urls = df_category['url']
-url_list = list(urls)
-
 names = df_category['name']
-name_list = list(names)
+reviewcounts = df_category['reviewCount']
+uberScores = df_category['uberScore']
+uberCategoryCounts = df_category['uberCategoryCount']
+bizTimeLengths = df_category['bizTimeLength']
+menuCounts = df_category['menuCount']
+menuDescriptionRates = df_category['menuDescriptionRate']
+menuDescriptionAves = df_category['menuDescriptionAve']
+menuPhotoRates = df_category['menuPhotoRate']
+menuPriceAves = df_category['menuPriceAve']
 
 final_df = pd.DataFrame(index=ranks, columns=[])
 final_df['店舗名'] = names
+final_df['レビュー数'] = reviewcounts
+final_df['評価'] = uberScores
+final_df['カテゴリ数'] = uberCategoryCounts
+final_df['営業時間'] = bizTimeLengths
+final_df['メニュー数'] = menuCounts
+final_df['メニュー説明割合'] = menuDescriptionRates
+final_df['写真登録割合'] = menuPhotoRates
+final_df['平均価格'] = menuPriceAves
 final_df['URL'] = urls
 
+final_df['評価'].astype(str)
+final_df['メニュー説明割合'].astype(str)
 #csvダウンロードメソッド
 def filedownload(df):
     csv = df.to_csv(index=True)
@@ -76,22 +91,34 @@ def filedownload(df):
     return href
 
 #ランキング
-if st.sidebar.button('適用'):
+if len(selected_prefecture) >1 and len(selected_city) >1 and len(selected_town) >1:
     st.write('住所：'+ selected_prefecture + selected_city + selected_town)
-    st.dataframe(final_df, 10000, 200)
+    st.write('店舗数：'+ str(len(final_df)))
+    st.dataframe(final_df)
+    print(final_df)
     st.markdown(filedownload(final_df), unsafe_allow_html=True)
+    
 else:
     st.write('左側で条件を選択し、適用を押してください')
-    st.write('ランキングが表示されます(csv出力も可能)')
+    st.write('表示順位ランキングが表示されます(csv出力も可能)')
 
 
 #店舗の検索
-st.subheader('・あなたの店舗と競合を知る')
+st.subheader('・店名検索')
 sort_name =st.text_input(
-    label = "店舗名（もしくはキーワード）を入力してください。あなたの店舗の順位がわかります。ex.(うどん)"
+    label = "店舗名（もしくはキーワード）を入力してください。ex.(うどん)"
 )
 sort_df = final_df[final_df['店舗名'].str.contains(sort_name, na=False)]
+sort_df_2 = sort_df[['店舗名', 'URL']]
+def make_clickable(link):
+    # target _blank to open new window
+    # extract clickable text to display for your link
+    return f'<a target="_blank" href="{link}">URL</a>'
+
+# link is the column with hyperlinks
+sort_df_2['URL'] = sort_df['URL'].apply(make_clickable)
+sort_df_2 = sort_df_2.to_html(escape=False)
 if len(sort_name) > 0:
-    st.dataframe(sort_df)
-    st.markdown(filedownload(sort_df), unsafe_allow_html=True)
+    st.write(sort_df_2, unsafe_allow_html=True)
+
 

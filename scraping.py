@@ -20,6 +20,7 @@ sleep(5)
 
 urls = []
 names = []
+ids = []
 i = 1
 url_path = '//*[@id="main-content"]/div/div/div[2]/div/div[2]/div[' + str(i) + ']/div'
 url_path_2 = '//*[@id="main-content"]/div/div/div[2]/div/div[4]/div[' + str(i) + ']/div'
@@ -57,7 +58,9 @@ if not is_selected_popular_sorted:
 
         while i < 800 :
             url_element = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH,url_path_3)))
-            urls.append(url_element.find_element_by_tag_name("a").get_attribute("href"))
+            URL = url_element.find_element_by_tag_name("a").get_attribute("href")
+            urls.append(URL)
+            ids.append(URL[-22:])
             name_element = browser.find_element_by_xpath(name_path).text
             names.append(name_element)
             name_path = '//*[@id="main-content"]/div/div/div[2]/div/div[2]/div[' + str(i) + ']/div/a/h3'
@@ -72,7 +75,10 @@ elif is_selected_popular_sorted:
     try:
         while i < 800 :
             url_element = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH,url_path)))
-            urls.append(url_element.find_element_by_tag_name("a").get_attribute("href"))
+            #urls.append(url_element.find_element_by_tag_name("a").get_attribute("href"))
+            URL = url_element.find_element_by_tag_name("a").get_attribute("href")
+            urls.append(URL)
+            ids.append(URL[-22:])
             name_element = browser.find_element_by_xpath(name_path).text
             names.append(name_element)
             i += 1
@@ -82,7 +88,10 @@ elif is_selected_popular_sorted:
     except NoSuchElementException:
         while i < 800 :
             url_element = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH,url_path_2)))
-            urls.append(url_element.find_element_by_tag_name("a").get_attribute("href"))
+            #urls.append(url_element.find_element_by_tag_name("a").get_attribute("href"))
+            URL = url_element.find_element_by_tag_name("a").get_attribute("href")
+            urls.append(URL)
+            ids.append(URL[-22:])
             name_element = browser.find_element_by_xpath(name_path).text
             names.append(name_element)  
             i += 1
@@ -92,11 +101,11 @@ elif is_selected_popular_sorted:
     except Exception as e:
         print(e)
 
-print(urls)
-print(names)
+print(ids)
 
 import pandas as pd
 df = pd.DataFrame(index=[],columns=[])
 df['URL'] = urls
 df['NAME'] = names
-df.to_csv("base.csv")
+df['ID'] = ids
+df.to_csv("b.csv")
